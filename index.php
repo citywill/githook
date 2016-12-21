@@ -3,7 +3,7 @@
  * windows 下的 git hook
  */
 
-function hookLog($logPath = 'logs', $project = null)
+function hookLog($logPath = 'logs', $project = null, $cmd = null, $outputArr = array())
 {
     $client_ip = $_SERVER['REMOTE_ADDR'];
 
@@ -27,15 +27,24 @@ function hookLog($logPath = 'logs', $project = null)
 
     fwrite($fs, 'Data: ' . print_r($data, true) . PHP_EOL);
 
+    fwrite($fs, 'CMD: ' . print_r($cmd, true) . PHP_EOL);
+
+    fwrite($fs, 'Output: ' . print_r($outputArr, true) . PHP_EOL);
+
     fwrite($fs, '===========' . PHP_EOL);
 
     $fs and fclose($fs);
 }
 
 $root = 'D:/wamp/www';
+
 $project = $_GET['project'];
+$branch = isset($_GET['branch']) ? $_GET['branch'] : 'develop';
+
 $projectPath = $root . '/' . $project;
 
-hookLog('logs', $project);
+$cmd = 'D: cd ' . $projectPath . ' && git pull origin ' . $branch;
 
-exec('cd ' . $projectPath . ' && git pull');
+exec($cmd, $outputArr);
+
+hookLog('logs', $project, $cmd, $outputArr);
